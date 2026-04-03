@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class Conexao {
 	
 	// Configurações do Banco de dados
-    private static final String URL = "jdbc:mysql://localhost:3306/projetin";
+    private static final String URL = "jdbc:mysql://localhost:3306/monitoramento_represa";
     private static final String USER = "root";
     private static final String PASSWORD = "9651luke";	
 
