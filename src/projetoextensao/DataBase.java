@@ -16,13 +16,21 @@ public class DataBase {
 	public void listarDados() throws SQLException {
 		
 		// Definição das colunas da tabela
-		String[] colunas = {"Id", "Id Represa", "Data", "Chuva (mm)", "% Volume", " % Chuva Acumulada - Mês"};
+		String[] colunas = {"Id", "Represa", "Data", "Chuva (mm)", "% Volume", " % Chuva Acumulada - Mês"};
 		
 		//Chamada da classe do modelo para tabela
 		DefaultTableModel modelo = new DefaultTableModel(colunas, 0);
 	
 		//Script SQL
-		String sql = "SELECT * FROM MONITORAMENTO;";
+		String sql = "SELECT\r\n"
+				+ "	MT.id,\r\n"
+				+ "    RP.nome,\r\n"
+				+ "    date_format(MT.data, '%d/%m/%Y') AS data,\r\n"
+				+ "    MT.chuva_mm,\r\n"
+				+ "    MT.volume_util_percent,\r\n"
+				+ "    MT.chuva_acumulada_mes_mm\r\n"
+				+ "FROM MONITORAMENTO MT\r\n"
+				+ "LEFT JOIN REPRESA RP ON RP.id = MT.id_represa";
 		
 		// Metodos de conexao
 		var consulta = con.getConect().prepareStatement(sql);
@@ -37,8 +45,8 @@ public class DataBase {
 	    	// Objeto para a composição de linhas da tablea
 	    	Object[] linha = {
 	    			resultado.getInt("id"),
-	    			resultado.getInt("id_represa"),
-	    			resultado.getDate("data"),
+	    			resultado.getString("nome"),
+	    			resultado.getString("data"),
 	    			resultado.getDouble("chuva_mm"),
 	    			resultado.getDouble("volume_util_percent"),
 	    			resultado.getDouble("chuva_acumulada_mes_mm")
