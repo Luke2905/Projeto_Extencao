@@ -46,7 +46,7 @@ Em `src/projetoextensao/Conexao.java`:
 
 - URL: `jdbc:mysql://localhost:3306/monitoramento_represa`
 - Usuario: `root`
-- Senha: `9651luke`
+- Senha: ``
 
 Se necessario, ajuste para o seu ambiente.
 
