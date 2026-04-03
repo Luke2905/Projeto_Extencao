@@ -6,7 +6,7 @@ Este projeto tem como objetivo compor o programa de Extensão Curricular, com in
 * Linguagem de Programação II;
 * Estatística.
 
-O seguinto trabalho consiste em uma Aplicacao Java desktop (Swing) que consulta dados de monitoramento de represas em um banco MySQL, com objetivo de analisar o volume nas represas, o impacto ambiental e social, e apresentar relatórios estatiscos sobre o tema.
+O seguinte trabalho consiste em uma Aplicacao Java desktop (Swing) que consulta dados de monitoramento de represas em um banco MySQL, com objetivo de analisar o volume nas represas, o impacto ambiental e social, e apresentar relatórios estatiscos sobre o tema.
 
 ## O que o projeto faz
 
