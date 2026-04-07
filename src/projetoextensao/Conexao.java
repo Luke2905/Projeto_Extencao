@@ -10,7 +10,7 @@ public class Conexao {
 	// Configurações do Banco de dados
     private static final String URL = "jdbc:mysql://localhost:3306/monitoramento_represa";
     private static final String USER = "root";
-    private static final String PASSWORD = "9651luke";	
+    private static final String PASSWORD = "";	
 
     public Connection getConect() {
         try {
