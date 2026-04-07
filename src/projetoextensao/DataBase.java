@@ -33,9 +33,9 @@ public class DataBase {
 				+ "FROM MONITORAMENTO MT\r\n"
 				+ "LEFT JOIN REPRESA RP ON RP.id = MT.id_represa\r\n"
 				+ "ORDER BY MT.data DESC;";
-		
-		// Abre a conexão e garante que que ela seja fechada 
-		try (Connection minhaConexao = con.getConect();
+			
+			// Abre a conexão e garante que que ela seja fechada 
+			try (Connection minhaConexao = con.getConect();
 				// Metodos de conexao
 			     var consulta = minhaConexao.prepareStatement(sql);
 				// Execução do Script
@@ -49,7 +49,7 @@ public class DataBase {
 				    			resultado.getInt("id"),
 				    			resultado.getString("nome"),
 				    			resultado.getString("data"),
-				    			String.format("%.2f", resultado.getDouble("chuva_mm")), // Formata para 2 casas decimais
+				    			String.format("%.2f", resultado.getDouble("chuva_mm")), // Formata para 2 casas decimais 
 				    		    String.format("%.2f", resultado.getDouble("volume_util_percent")),
 				    		    String.format("%.2f", resultado.getDouble("chuva_acumulada_mes_mm"))
 				    	};
@@ -71,12 +71,106 @@ public class DataBase {
 				    
 				    JOptionPane.showMessageDialog(null, scroll, "Relatório de Monitoramento de Represas", JOptionPane.PLAIN_MESSAGE);
 
-				 } catch (SQLException e) {
+				    //Chama a ela
+				    //Tela tela = new Tela(modelo);
+				   // tela.setVisible(true);
+		
+			} catch (SQLException e) {
 					 
 				        JOptionPane.showMessageDialog(null, "Erro ao carregar tabela: " + e.getMessage());
 				 }
 	
+		
+		}
+		
+		public void totalDados() throws SQLException {
+			
+			//Total de Registros
+			String sql = "SELECT COUNT(*) AS TOTAL FROM MONITORAMENTO;";
+			
+			
+			Connection minhaConexao = con.getConect();
+			
+			// Metodos de conexao
+		     var consulta = minhaConexao.prepareStatement(sql);
+			// Execução do Script
+		     var resultado = consulta.executeQuery();
+		     
+		     //Exibe resultado
+		     if (resultado.next()) {
+		    	    int total = resultado.getInt("TOTAL");
+		    	    JOptionPane.showMessageDialog(null, "Total de registros no sistema: " + total);
+		    }
 	
-	}
+		    	// Fecha a conexão
+		    	resultado.close();
+		    	consulta.close();
+		    	minhaConexao.close();
+			
+		}
+		
+		public void mediaDados() throws SQLException {
+			
+			//Total de Registros
+			String sql = "SELECT AVG(chuva_mm) AS media FROM MONITORAMENTO;";
+			
+			
+			Connection minhaConexao = con.getConect();
+			
+			// Metodos de conexao
+		     var consulta = minhaConexao.prepareStatement(sql);
+			// Execução do Script
+		     var resultado = consulta.executeQuery();
+		     
+		     //Exibe resultado
+		     if (resultado.next()) {
+		    	    int total = resultado.getInt("media");
+		    	    JOptionPane.showMessageDialog(null, "Média Histórica do volume de Chuva em mm: " + total);
+		    }
+	
+		    	// Fecha a conexão
+		    	resultado.close();
+		    	consulta.close();
+		    	minhaConexao.close();
+			
+		}
+		
+		public void menorRegistro() throws SQLException {
+			
+			//Total de Registros
+			String sql = "SELECT \r\n"
+					+ "    MT.id,\r\n"
+					+ "    RP.nome,\r\n"
+					+ "    DATE_FORMAT(MT.data, '%d/%m/%Y') AS data,\r\n"
+					+ "    MT.volume_util_percent AS volume \r\n"
+					+ "FROM MONITORAMENTO MT\r\n"
+					+ "LEFT JOIN REPRESA RP ON RP.id = MT.id_represa\r\n"
+					+ "ORDER BY MT.volume_util_percent ASC  -- ASC = Menor para o Maior\r\n"
+					+ "LIMIT 1;";
+			
+			
+			Connection minhaConexao = con.getConect();
+			
+			// Metodos de conexao
+		     var consulta = minhaConexao.prepareStatement(sql);
+			// Execução do Script
+		     var resultado = consulta.executeQuery();
+		     
+		     //Exibe resultado
+		     if (resultado.next()) {
+		    	 	String nome = resultado.getString("nome");
+		    	 	String data = resultado.getString("data");
+		    	    int total = resultado.getInt("volume");
+		    	    JOptionPane.showMessageDialog(null, "Menor Volume Registrado no Periodo: \n"
+		    	    		+ "Represa: " + nome + "\n"
+		    	    		+ "Data: " + data + " Volume Registrado: " + total );
+		    }
+	
+		    	// Fecha a conexão
+		    	resultado.close();
+		    	consulta.close();
+		    	minhaConexao.close();
+			
+		}
 	
 }
