@@ -23,6 +23,7 @@ public class Principal {
 					+ "2 - Total de Dados Registrados\n"
 					+ "3 - Média Histórica\n"
 					+ "4 - Menor Volume Registrado\n"
+					+ "5 - Gráfico Chuva x Volume\n"
 					+ "0 - Sair");
 			
 			switch (opcao) {
@@ -51,6 +52,18 @@ public class Principal {
 				
 				//Exibir Menor Volume
 				db.menorRegistro();
+				
+				break;
+			}
+			case "5": {
+				
+				// Exibir Gráfico
+				try {
+					DadosGraficoChuvaVolume dadosGrafico = db.buscarDadosGraficoChuvaVolume();
+					TelaGraficoChuvaVolume.exibir(dadosGrafico);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, "Erro ao carregar gráfico: " + e.getMessage());
+				}
 				
 				break;
 			}

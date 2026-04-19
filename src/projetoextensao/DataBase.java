@@ -2,6 +2,8 @@ package projetoextensao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -170,6 +172,41 @@ public class DataBase {
 		    	resultado.close();
 		    	consulta.close();
 		    	minhaConexao.close();
+			
+		}
+
+		public DadosGraficoChuvaVolume buscarDadosGraficoChuvaVolume() throws SQLException {
+			
+			String sql = "SELECT "
+					+ "DATE_FORMAT(MT.data, '%d/%m/%Y') AS data, "
+					+ "AVG(MT.chuva_mm) AS chuva_mm, "
+					+ "AVG(MT.volume_util_percent) AS volume_util_percent "
+					+ "FROM MONITORAMENTO MT "
+					+ "GROUP BY MT.data "
+					+ "ORDER BY MT.data;";
+			
+			List<String> datas = new ArrayList<>();
+			List<Double> chuvas = new ArrayList<>();
+			List<Double> volumes = new ArrayList<>();
+			
+			Connection minhaConexao = con.getConect();
+			
+			if (minhaConexao == null) {
+				throw new SQLException("Não foi possível abrir conexão para montar o gráfico.");
+			}
+			
+			try (minhaConexao;
+			     var consulta = minhaConexao.prepareStatement(sql);
+			     var resultado = consulta.executeQuery()) {
+				
+				while (resultado.next()) {
+					datas.add(resultado.getString("data"));
+					chuvas.add(resultado.getDouble("chuva_mm"));
+					volumes.add(resultado.getDouble("volume_util_percent"));
+				}
+				
+				return new DadosGraficoChuvaVolume(datas, chuvas, volumes);
+			}
 			
 		}
 	
