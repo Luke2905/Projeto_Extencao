@@ -127,6 +127,30 @@ public class DataBase {
 		return represas;
 	}
 
+	public DadosGraficoChuvaVolume buscarDadosGraficoChuvaVolume() throws SQLException {
+
+		// SQL para alimentar o grafico chuva x volume criado pelo grupo
+		String sql = "SELECT " + "DATE_FORMAT(MT.data, '%d/%m/%Y') AS data, " + "AVG(MT.chuva_mm) AS chuva_mm, "
+				+ "AVG(MT.volume_util_percent) AS volume_util_percent " + "FROM MONITORAMENTO MT "
+				+ "GROUP BY MT.data " + "ORDER BY MT.data;";
+
+		List<String> datas = new ArrayList<>();
+		List<Double> chuvas = new ArrayList<>();
+		List<Double> volumes = new ArrayList<>();
+
+		try (Connection minhaConexao = abrirConexao(); var consulta = minhaConexao.prepareStatement(sql);
+				var resultado = consulta.executeQuery()) {
+
+			while (resultado.next()) {
+				datas.add(resultado.getString("data"));
+				chuvas.add(resultado.getDouble("chuva_mm"));
+				volumes.add(resultado.getDouble("volume_util_percent"));
+			}
+		}
+
+		return new DadosGraficoChuvaVolume(datas, chuvas, volumes);
+	}
+
 	private DefaultTableModel montarModeloTabelaCompleta() throws SQLException {
 
 		// Definicao das colunas da tabela
@@ -135,8 +159,8 @@ public class DataBase {
 
 		// Aproveita o mesmo metodo que abastece o dashboard
 		for (MonitoramentoRegistro registro : buscarMonitoramentoCompleto()) {
-			Object[] linha = { registro.getId(), registro.getRepresa(), registro.getData(), String.format("%.2f", registro.getChuvaMm()),
-					String.format("%.2f", registro.getVolumeUtilPercent()),
+			Object[] linha = { registro.getId(), registro.getRepresa(), registro.getData(),
+					String.format("%.2f", registro.getChuvaMm()), String.format("%.2f", registro.getVolumeUtilPercent()),
 					String.format("%.2f", registro.getChuvaAcumuladaMesMm()) };
 
 			modelo.addRow(linha);

@@ -8,6 +8,9 @@ public class Principal {
 
 	public static void main(String[] args) {
 
+		// Mensagem inicial para manter o fluxo amigavel ao usuario
+		JOptionPane.showMessageDialog(null, "Bem-vindo ao Painel de Monitoramento de Represas 2020 - 2026");
+
 		// Inicializa a interface no padrao visual do sistema operacional
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

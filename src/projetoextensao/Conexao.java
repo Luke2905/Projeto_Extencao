@@ -14,12 +14,17 @@ public class Conexao {
 
 	public Connection getConect() {
 		try {
+			// Garante carregamento do driver JDBC mesmo em ambientes antigos
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
 			// Ele tenta criar e retornar a conexao viva
 			return DriverManager.getConnection(URL, USER, PASSWORD);
+		} catch (ClassNotFoundException e) {
+			System.err.println("Driver MySQL nao encontrado: " + e.getMessage());
 		} catch (SQLException e) {
 			// Imprime o erro real para facilitar debug em aula/laboratorio
 			System.err.println("Erro na conexao: " + e.getMessage());
-			return null;
 		}
+		return null;
 	}
 }

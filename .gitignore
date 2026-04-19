@@ -1,1 +1,5 @@
-/bin/
+todo.txt
+.env
+*.class
+bin/
+bin/*
