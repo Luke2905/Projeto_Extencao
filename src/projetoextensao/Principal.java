@@ -1,73 +1,29 @@
 package projetoextensao;
 
-import java.lang.classfile.instruction.SwitchCase;
-import java.sql.SQLException;
-
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 public class Principal {
 
-	public static void main(String[] args) throws SQLException {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) {
 
-		JOptionPane.showMessageDialog(null, "Bem Vindo ao Painel de Monitoramento de Represas 2020 - 2026");
-		
-		DataBase db = new DataBase();
-		
-		String opcao = ""; 
-		
-		while (!opcao.equals("0")) {
-			
-			opcao = JOptionPane.showInputDialog(null,"			Menu \n"
-					+ "Selecione a informação que quer visualizar\n"
-					+ "1 - Tabela de Dados\n"
-					+ "2 - Total de Dados Registrados\n"
-					+ "3 - Média Histórica\n"
-					+ "4 - Menor Volume Registrado\n"
-					+ "0 - Sair");
-			
-			switch (opcao) {
-			case "1": {
-				
-				// Listar dados
-				db.listarDados();
-				
-				break;
-			}
-			case "2": {
-				
-				// Exibir Total
-				db.totalDados();
-				
-				break;
-			}
-			case "3": {
-				
-				// Exibir Média
-				db.mediaDados();
-				
-				break;
-			}
-			case "4": {
-				
-				//Exibir Menor Volume
-				db.menorRegistro();
-				
-				break;
-			}
-			case "0": {
-				//Fechando o programa
-				JOptionPane.showMessageDialog(null, "Encerrando o Programa!!");
-				System.exit(0);
-			}
-			default:
-				JOptionPane.showMessageDialog(null, "Escolha as opções do menu.");
-			}
-			
-			
+		// Inicializa a interface no padrao visual do sistema operacional
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			System.err.println("Falha ao aplicar tema do sistema: " + e.getMessage());
 		}
-		
-		
-	}
 
+		// Abre a tela principal no fluxo grafico do Swing
+		SwingUtilities.invokeLater(() -> {
+			try {
+				Tela tela = new Tela(new DataBase());
+				tela.setVisible(true);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Nao foi possivel iniciar o sistema.\n" + e.getMessage(),
+						"Erro de inicializacao", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+	}
 }
