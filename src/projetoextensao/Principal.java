@@ -1,6 +1,5 @@
 package projetoextensao;
-
-import java.lang.classfile.instruction.SwitchCase;
+// import java.lang.classfile.instruction.SwitchCase;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
