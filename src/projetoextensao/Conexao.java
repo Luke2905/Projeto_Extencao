@@ -22,7 +22,7 @@ public class Conexao {
 		} catch (ClassNotFoundException e) {
 			System.err.println("Driver MySQL nao encontrado: " + e.getMessage());
 		} catch (SQLException e) {
-			// Imprime o erro real para facilitar debug em aula/laboratorio
+			// Imprime o erro real 
 			System.err.println("Erro na conexao: " + e.getMessage());
 		}
 		return null;
