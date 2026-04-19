@@ -1,5 +1,5 @@
-
 todo.txt
 .env
 *.class
+bin/
 bin/*
