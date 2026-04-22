@@ -72,6 +72,7 @@ public class Tela extends JFrame {
 	// Componentes de conteudo
 	private final CardLayout cardLayout = new CardLayout();
 	private final JPanel painelConteudo = new JPanel(cardLayout);
+	private final JPanel painelChuvaVolume = new JPanel(new BorderLayout());
 	private final BarChartPanel graficoVolumeRepresa = new BarChartPanel("Volume medio por represa (%)");
 	private final LineChartPanel graficoChuvaTempo = new LineChartPanel("Chuva media por data (mm)");
 	private final JTextArea areaAnalisesResumo = new JTextArea();
@@ -143,7 +144,7 @@ public class Tela extends JFrame {
 		btnAnalises.addActionListener(e -> cardLayout.show(painelConteudo, "analises"));
 
 		JButton btnChuvaVolume = criarBotaoMenu("Chuva x Volume");
-		btnChuvaVolume.addActionListener(e -> abrirGraficoChuvaVolume());
+		btnChuvaVolume.addActionListener(e -> cardLayout.show(painelConteudo, "chuvaVolume"));
 
 		menu.add(titulo);
 		menu.add(Box.createVerticalStrut(6));
@@ -218,6 +219,7 @@ public class Tela extends JFrame {
 		painelConteudo.add(criarPaginaDashboard(), "dashboard");
 		painelConteudo.add(criarPaginaTabela(), "tabela");
 		painelConteudo.add(criarPaginaAnalises(), "analises");
+		painelConteudo.add(criarPaginaChuvaVolume(), "chuvaVolume");
 
 		JPanel conteudo = new JPanel(new BorderLayout());
 		conteudo.setOpaque(false);
@@ -285,6 +287,13 @@ public class Tela extends JFrame {
 		pagina.setOpaque(false);
 		pagina.add(criarCardGenerico("Analises Estrategicas", scroll), BorderLayout.CENTER);
 		return pagina;
+	}
+
+	private JPanel criarPaginaChuvaVolume() {
+
+		// Pagina integrada ao menu lateral para o grafico detalhado
+		painelChuvaVolume.setOpaque(false);
+		return painelChuvaVolume;
 	}
 
 	private JPanel criarCardKpi(String titulo, JLabel valor) {
@@ -417,18 +426,6 @@ public class Tela extends JFrame {
 		atualizarDashboard();
 	}
 
-	private void abrirGraficoChuvaVolume() {
-
-		try {
-			// Reaproveita o backend ja criado para abrir o grafico detalhado em janela propria
-			DadosGraficoChuvaVolume dadosGrafico = db.buscarDadosGraficoChuvaVolume();
-			TelaGraficoChuvaVolume.exibir(dadosGrafico);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "Nao foi possivel abrir o grafico Chuva x Volume.\n" + e.getMessage(),
-					"Erro ao abrir grafico", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
 	private void atualizarDashboard() {
 
 		// Atualiza todos os componentes visuais com base nos dados atuais
@@ -436,6 +433,7 @@ public class Tela extends JFrame {
 		atualizarKpis();
 		atualizarGraficos();
 		atualizarAnalises();
+		atualizarPaginaChuvaVolume();
 	}
 
 	private void atualizarTabela() {
@@ -548,6 +546,63 @@ public class Tela extends JFrame {
 				+ "- Use esta pagina para detectar periodos de queda de volume.\n"
 				+ "- Cruze o grafico de chuva com o indicador de volume para inferir recuperacao.\n"
 				+ "- Observe represas com maior frequencia de volume abaixo de 30% para priorizar acoes.");
+	}
+
+	private void atualizarPaginaChuvaVolume() {
+
+		// Recria o painel com base nos dados filtrados para manter o grafico sincronizado com a tela principal
+		painelChuvaVolume.removeAll();
+
+		DadosGraficoChuvaVolume dadosGrafico = montarDadosGraficoChuvaVolumeFiltrado();
+		if (dadosGrafico == null || dadosGrafico.estaVazio()) {
+			JPanel vazio = new JPanel(new BorderLayout());
+			vazio.setOpaque(false);
+
+			JLabel titulo = new JLabel("Chuva x Volume", SwingConstants.CENTER);
+			titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
+			titulo.setForeground(new Color(84, 92, 108));
+
+			JLabel mensagem = new JLabel("Nao ha dados suficientes para gerar o grafico com os filtros atuais.",
+					SwingConstants.CENTER);
+			mensagem.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+			mensagem.setForeground(new Color(120, 126, 142));
+
+			vazio.add(titulo, BorderLayout.NORTH);
+			vazio.add(mensagem, BorderLayout.CENTER);
+			painelChuvaVolume.add(vazio, BorderLayout.CENTER);
+		} else {
+			painelChuvaVolume.add(new TelaGraficoChuvaVolume(dadosGrafico), BorderLayout.CENTER);
+		}
+
+		painelChuvaVolume.revalidate();
+		painelChuvaVolume.repaint();
+	}
+
+	private DadosGraficoChuvaVolume montarDadosGraficoChuvaVolumeFiltrado() {
+
+		// Agrupa os dados filtrados por data para alimentar o painel detalhado de chuva x volume
+		NavigableMap<LocalDate, List<MonitoramentoRegistro>> agrupado = new TreeMap<>();
+
+		for (MonitoramentoRegistro registro : dadosFiltrados) {
+			agrupado.computeIfAbsent(registro.getData(), chave -> new ArrayList<>()).add(registro);
+		}
+
+		List<String> datas = new ArrayList<>();
+		List<Double> chuvas = new ArrayList<>();
+		List<Double> volumes = new ArrayList<>();
+
+		for (Map.Entry<LocalDate, List<MonitoramentoRegistro>> entrada : agrupado.entrySet()) {
+			List<MonitoramentoRegistro> registrosData = entrada.getValue();
+			double mediaChuva = registrosData.stream().mapToDouble(MonitoramentoRegistro::getChuvaMm).average().orElse(0.0);
+			double mediaVolume = registrosData.stream().mapToDouble(MonitoramentoRegistro::getVolumeUtilPercent).average()
+					.orElse(0.0);
+
+			datas.add(formatoData.format(entrada.getKey()));
+			chuvas.add(mediaChuva);
+			volumes.add(mediaVolume);
+		}
+
+		return new DadosGraficoChuvaVolume(datas, chuvas, volumes);
 	}
 
 	private String calcularTendenciaVolume() {
