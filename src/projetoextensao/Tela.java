@@ -142,6 +142,9 @@ public class Tela extends JFrame {
 		JButton btnAnalises = criarBotaoMenu("Analises");
 		btnAnalises.addActionListener(e -> cardLayout.show(painelConteudo, "analises"));
 
+		JButton btnChuvaVolume = criarBotaoMenu("Chuva x Volume");
+		btnChuvaVolume.addActionListener(e -> abrirGraficoChuvaVolume());
+
 		menu.add(titulo);
 		menu.add(Box.createVerticalStrut(6));
 		menu.add(subtitulo);
@@ -151,6 +154,8 @@ public class Tela extends JFrame {
 		menu.add(btnTabela);
 		menu.add(Box.createVerticalStrut(10));
 		menu.add(btnAnalises);
+		menu.add(Box.createVerticalStrut(10));
+		menu.add(btnChuvaVolume);
 		menu.add(Box.createVerticalGlue());
 
 		return menu;
@@ -410,6 +415,18 @@ public class Tela extends JFrame {
 		campoDataFinal.setText("");
 		dadosFiltrados = new ArrayList<>(dadosBase);
 		atualizarDashboard();
+	}
+
+	private void abrirGraficoChuvaVolume() {
+
+		try {
+			// Reaproveita o backend ja criado para abrir o grafico detalhado em janela propria
+			DadosGraficoChuvaVolume dadosGrafico = db.buscarDadosGraficoChuvaVolume();
+			TelaGraficoChuvaVolume.exibir(dadosGrafico);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Nao foi possivel abrir o grafico Chuva x Volume.\n" + e.getMessage(),
+					"Erro ao abrir grafico", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void atualizarDashboard() {
